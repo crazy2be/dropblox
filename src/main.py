@@ -194,6 +194,26 @@ class Board(object):
     new_bitmap = [row for row in bitmap if not all(row)]
     return [cols*[0] for i in range(rows - len(new_bitmap))] + new_bitmap
 
+  def num_holes(self):
+    (rows, cols) = (len(self.bitmap), len(self.bitmap[0]))
+    holes = 0
+    # Counts any overhang as a hole. This is pessimistic, but should work
+    # reasonably well.
+    column_occupied = cols*[0]
+    for row in range(0, rows):
+      for col in range(0, cols):
+        if self.bitmap[row][col] == 0:
+          if column_occupied[col]:
+            holes += 1
+        else:
+          column_occupied[col] += 1
+    return holes
+
+  def evaluate(self):
+    return -self.num_holes()
+
+print Board([[1, 1, 1], [1, 0, 1], [1, 1, 1]], None, None).num_holes()
+
 if __name__ == '__main__':
   if len(sys.argv) == 3:
     # This AI executable will be called with two arguments: a JSON blob of the
