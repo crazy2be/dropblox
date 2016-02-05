@@ -209,8 +209,20 @@ class Board(object):
           column_occupied[col] += 1
     return holes
 
+  def max_height(self):
+    (rows, cols) = (len(self.bitmap), len(self.bitmap[0]))
+    m_height = 0
+    for col in range(0, cols):
+      col_height = 0
+      for row in range(0, rows):
+        if self.bitmap[row][col] != 0:
+          col_height = rows - row
+          break
+      m_height = max(m_height, col_height)
+    return m_height
+
   def evaluate(self):
-    return -self.num_holes()
+    return -self.num_holes() - self.max_height()
 
 print Board([[1, 1, 1], [1, 0, 1], [1, 1, 1]], None, None).num_holes()
 
