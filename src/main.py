@@ -247,7 +247,7 @@ class Board(object):
 
   def evaluate(self):
     return -self.num_holes() - self.max_height() \
-      - self.height_variance() - self.height_penalty()
+      - self.height_variance()# - self.height_penalty()
 
 test_board = Board([[1, 1, 1], [1, 0, 1], [1, 1, 1]], None, None)
 print test_board.num_holes()
