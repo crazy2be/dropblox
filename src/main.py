@@ -226,10 +226,27 @@ if __name__ == '__main__':
     # current block
     block = board.block
 
-    while block.checked_left(board):
-      print 'left'
-    while block.checked_down(board):
-      print 'down'
-    while block.checked_right(board):
-      print 'right'
+    best = -sys.maxint - 1
+    choices = {}
+    for i in range(0, 12):
+      moves = []
+      while block.checked_left(board):
+        moves.append('left')
+      for _ in range(0, i):
+        moves.append('right')
+      while block.checked_down(board):
+        moves.append('down')
+
+      for _ in xrange(0, 3):
+        moves.append('rotate')
+        block.reset_position()
+        try:
+          new_board = board.do_commands(moves[:])
+          cur = new_board.evaluate()
+          choices[cur] = moves[:]
+        except InvalidMoveError as e:
+          continue
+
+    todo = choices[max(choices)]
+    print '\n'.join(todo)
     sys.stdout.flush()
