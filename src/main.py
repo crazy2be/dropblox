@@ -242,7 +242,7 @@ class Board(object):
     for row in range(0, rows):
       for col in range(0, cols):
         if self.bitmap[row][col] != 0:
-          penalty += row
+          penalty += rows - row
     return penalty
 
   def evaluate(self):
