@@ -194,8 +194,11 @@ class Board(object):
     new_bitmap = [row for row in bitmap if not all(row)]
     return [cols*[0] for i in range(rows - len(new_bitmap))] + new_bitmap
 
+  def size(self):
+    return (len(self.bitmap), len(self.bitmap[0]))
+
   def num_holes(self):
-    (rows, cols) = (len(self.bitmap), len(self.bitmap[0]))
+    (rows, cols) = self.size()
     holes = 0
     # Counts any overhang as a hole. This is pessimistic, but should work
     # reasonably well.
@@ -209,22 +212,48 @@ class Board(object):
           column_occupied[col] += 1
     return holes
 
+  def col_height(self, col):
+    (rows, _) = self.size()
+    for row in range(0, rows):
+      if self.bitmap[row][col] != 0:
+        return rows - row
+    return 0
+
   def max_height(self):
-    (rows, cols) = (len(self.bitmap), len(self.bitmap[0]))
+    (rows, cols) = self.size()
     m_height = 0
     for col in range(0, cols):
-      col_height = 0
-      for row in range(0, rows):
-        if self.bitmap[row][col] != 0:
-          col_height = rows - row
-          break
-      m_height = max(m_height, col_height)
+      m_height = max(m_height, self.col_height(col))
     return m_height
 
-  def evaluate(self):
-    return -self.num_holes() - self.max_height()
+  def height_variance(self):
+    (rows, cols) = self.size()
+    variance = 0
+    prev = self.col_height(0)
+    for col in range(0, cols):
+      cur = self.col_height(col)
+      variance += abs(cur - prev)
+      prev = cur
+    return variance
 
-print Board([[1, 1, 1], [1, 0, 1], [1, 1, 1]], None, None).num_holes()
+  def height_penalty(self):
+    (rows, cols) = self.size()
+    penalty = 0
+    for row in range(0, rows):
+      for col in range(0, cols):
+        if self.bitmap[row][col] != 0:
+          penalty += row
+    return penalty
+
+  def evaluate(self):
+    return -self.num_holes() - self.max_height() \
+      - self.height_variance() - self.height_penalty()
+
+test_board = Board([[1, 1, 1], [1, 0, 1], [1, 1, 1]], None, None)
+print test_board.num_holes()
+print test_board.max_height()
+print test_board.height_variance()
+print test_board.height_penalty()
 
 if __name__ == '__main__':
   if len(sys.argv) == 3:
